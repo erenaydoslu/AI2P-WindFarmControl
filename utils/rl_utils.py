@@ -7,7 +7,8 @@ from utils.extract_windspeed import WindSpeedExtractor
 from utils.preprocessing import read_turbine_positions, get_wind_angles_for_range, correct_angles, read_measurement
 
 
-def create_validation_points(case_nr, num_points, seed=42, map_size=(300, 300)):
+def create_validation_points(case_nr, num_points, seed=42, map_size=(128, 128), return_maps=False):
+
     points = []
     random.seed(seed)
     data_dir = f"data/Case_01"
@@ -22,7 +23,10 @@ def create_validation_points(case_nr, num_points, seed=42, map_size=(300, 300)):
     data_range = range(30005, 42000 + 1, 5)
     wind_angles = correct_angles(get_wind_angles_for_range(f"{data_dir}/HKN_{turbines}_dir.csv", data_range, 30000))
     sample_range = list(enumerate(data_range))
-    samples = random.sample(sample_range, num_points)
+    if num_points > len(data_range):
+        samples = sample_range
+    else:
+        samples = random.sample(sample_range, num_points)
 
     # Retrieve the yaws for both strategies
     all_greedy_yaws = read_measurement(greedy_yaw_dir, "nacYaw")
@@ -46,9 +50,16 @@ def create_validation_points(case_nr, num_points, seed=42, map_size=(300, 300)):
         greedy_power = wind_speed_to_power(greedy_yaws, wind_angle, greedy_wind_speed)
         wake_power = wind_speed_to_power(wake_yaws, wind_angle, wake_wind_speed)
 
-        # Add the new validation point to the set
-        points.append({"wind_direction": wind_angle, "greedy_power": np.sum(greedy_power), "wake_power": np.sum(wake_power)})
-        
+
+        if return_maps:
+            # Return the angle, yaws and resulting maps
+            points.append({"wind_direction": wind_angle, "greedy_yaws": greedy_yaws, "greedy_map": greedy_map,
+                           "wake_yaws": wake_yaws, "wake_map": wake_map, "greedy_power": np.sum(greedy_power), "wake_power": np.sum(wake_power)})
+
+        else:
+            # Add the new validation point to the set
+            points.append({"wind_direction": wind_angle, "greedy_power": np.sum(greedy_power), "wake_power": np.sum(wake_power)})
+
     return points
 
 
