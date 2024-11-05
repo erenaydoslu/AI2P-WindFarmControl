@@ -89,8 +89,8 @@ class TestComparisonCallback(BaseCallback):
 
         mean_greedy_power = np.mean(greedy_val_power)
         mean_steering_power = np.mean(model_val_power)
-        self.logger.record("evaluation/avg_model_greedy_power", mean_greedy_power)
-        self.logger.record("evaluation/avg_model_steering_power", mean_steering_power)
+        self.logger.record("evaluation/avg_model_greedy_power", mean_greedy_power*1e7)
+        self.logger.record("evaluation/avg_model_steering_power", mean_steering_power*1e7)
         self.logger.record("evaluation/avg_sim_greedy_power", self.avg_sim_greedy_power)
         self.logger.record("evaluation/avg_sim_steering_power", self.avg_sim_steering_power)
 
