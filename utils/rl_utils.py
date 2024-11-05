@@ -43,8 +43,8 @@ def create_validation_points(case_nr, num_points, seed=42, map_size=(128, 128), 
         wake_map = load_scalars(greedy_map_dir, timestep, map_size).reshape(map_size[0], map_size[1])
 
         # Extract the wind speed for both strategies
-        greedy_wind_speed = wind_map_extractor(greedy_map, yaw_angles=greedy_yaws)
-        wake_wind_speed = wind_map_extractor(wake_map, yaw_angles=wake_yaws)
+        greedy_wind_speed = wind_map_extractor(greedy_map, wind_angle=wind_angle, yaw_angles=greedy_yaws)
+        wake_wind_speed = wind_map_extractor(wake_map, wind_angle=wind_angle, yaw_angles=wake_yaws)
 
         # Calculate the power for both strategies
         greedy_power = wind_speed_to_power(greedy_yaws, wind_angle, greedy_wind_speed)

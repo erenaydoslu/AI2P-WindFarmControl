@@ -26,7 +26,7 @@ TOTAL_SIMULATION_SECONDS = 12000 #Total duration of the LES simulation the PINN 
 TIME_SCALING_FACTOR = 1/6000 #One second delta in real life corresponds to a 1/6000 delta on the model input
 
 class ContinuousTurbineEnv(gym.Env):
-    metadata = {"render_modes": ["rgb_array", "matplotlib"], "render_fps": 4}
+    metadata = {"render_modes": ["rgb_array", "matplotlib"], "render_fps": 1}
 
     def __init__(self, wind_speed_map_model, turbine_locations, render_mode=None, map_size=300, max_yaw=30, pinn_time_start_point=0.2, dynamic_time=False):
         self.turbine_locations = torch.tensor(turbine_locations)
@@ -129,7 +129,8 @@ class ContinuousTurbineEnv(gym.Env):
         yaws = self._action_to_yaw(action, self.wind_direction[0])
 
         wind_speed_map, _ = self.predict_wind_speed_map(yaws, self.wind_direction[0])
-        self._last_wind_speed = self.wind_speed_extractor(wind_speed_map, yaws)
+
+        self._last_wind_speed = self.wind_speed_extractor(wind_speed_map, self.wind_direction[0], yaws)
 
         # Convert the extracted wind speeds at the turbines to power
         power = wind_speed_to_power(yaws, self.wind_direction[0], self._last_wind_speed)
@@ -142,7 +143,7 @@ class ContinuousTurbineEnv(gym.Env):
 
         # Return tuple in form observation, reward, terminated, truncated, info.
         # Power is the reward, and as of now, the environment does not terminate.
-        return observation, np.mean(power), False, False, info
+        return observation, np.mean(power) / 1e7, False, False, info
 
     def predict_wind_speed_map(self, yaws, wind_direction):
         yaw_tensor = torch.from_numpy(yaws)
@@ -171,10 +172,12 @@ class ContinuousTurbineEnv(gym.Env):
 
         wind_speed_map, wind_vec = self.predict_wind_speed_map(yaws, self.wind_direction[0])
 
+        print(f"{np.round(yaws - self.wind_direction, 1)}")
+
         turbine_pixels = []
 
-        self.wind_speed_extractor(wind_speed_map, correct_angles(yaws), turbine_pixels)
-        wind_vec = 75 * wind_vec
+        self.wind_speed_extractor(wind_speed_map, wind_angle=self.wind_direction[0], yaw_angles=yaws, location_pixels=turbine_pixels)
+        wind_vec = 150 * wind_vec
 
         if self.render_mode == "rgb_array":
             plot_mean_absolute_speed(wind_speed_map, wind_vec, windmill_blades=turbine_pixels)
@@ -230,8 +233,8 @@ class ContinuousTurbineEnv(gym.Env):
 
 
 def create_env(max_episode_steps=100, max_yaw=30, render_mode="matplotlib", pinn_start=0.2, dynamic_time=False):
-    checkpoint = torch.load("experiments/NavierStokes/models/SiLU256-d5-p0.01-f/model620.pt")
-    model = PINN(in_dimensions=26, hidden_size=256, out_dimensions=4)
+    checkpoint = torch.load("D:/models2/SiLU128-d5-p0.01-f-b/model337.pt")
+    model = PINN(in_dimensions=26, hidden_size=128, out_dimensions=4)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.cuda().eval()
 

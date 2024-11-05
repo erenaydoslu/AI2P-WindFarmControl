@@ -23,22 +23,22 @@ def train(max_steps, max_yaw, dynamic_time, pinn_start):
 
 
     val_points = create_validation_points(case_nr=1, num_points=100, map_size=(300, 300))
-    eval_callback = EveryNTimesteps(n_steps=250, callback=TestComparisonCallback(env, val_points=val_points))
+    eval_callback = EveryNTimesteps(n_steps=1000, callback=TestComparisonCallback(env, val_points=val_points))
 
     fig_callback = FigureRecorderCallback(env)
-    ntimestep_callback = EveryNTimesteps(n_steps=250, callback=fig_callback)
+    ntimestep_callback = EveryNTimesteps(n_steps=500, callback=fig_callback)
 
     checkpoint_callback = CheckpointCallback(save_freq=1000, save_path="./models/", name_prefix="td3_model")
 
     # The noise objects for TD3
     n_actions = env.action_space.shape[-1]
-    action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.01 * np.ones(n_actions))
+    action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions))
 
-    model = TD3(MlpPolicy, env, action_noise=action_noise, verbose=1, tensorboard_log="./turbine_env/")
+    model = TD3(MlpPolicy, env, learning_rate=1e-5, action_noise=action_noise, verbose=1, tensorboard_log="./turbine_env/")
 
 
     log_path = f"TD3-m{max_steps}-y{max_yaw}-{dynamic_time}{f'-{pinn_start}' if dynamic_time else ''}"
-    model.learn(total_timesteps=100000, progress_bar=True, tb_log_name=log_path,
+    model.learn(total_timesteps=200_000, progress_bar=True, tb_log_name=log_path,
                 callback=[checkpoint_callback, ntimestep_callback, eval_callback])
     
     model.save("TD3TurbineEnvModel")

@@ -84,7 +84,7 @@ def add_quiver(ax, wind_vec, center):
 
 
 def add_imshow(fig, ax, umean_abs, color_bar=True):
-    axesImage = ax.imshow(umean_abs, extent=(0, 128, 0, 128), origin='lower', aspect='equal', vmin=0, vmax=10)
+    axesImage = ax.imshow(umean_abs, extent=(0, 300, 0, 300), origin='lower', aspect='equal', vmin=0, vmax=9)
     if color_bar:
         fig.colorbar(axesImage, ax=ax, label='Mean Velocity (UmeanAbs)')
     return axesImage
