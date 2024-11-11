@@ -14,5 +14,5 @@ The main objective of this project is to explore data-driven methods to optimize
 
 ## Project Report
 
-For a detailed explanation of the methodology, experiments, and results, please refer to the [final report](AI2P - Final Report.pdf).
+For a detailed explanation of the methodology, experiments, and results, please refer to the [report](https://github.com/erenaydoslu/AI2P-WindFarmControl/blob/main/AI2P%20-%20Final%20Report.pdf).
 
