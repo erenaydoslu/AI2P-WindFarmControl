@@ -10,7 +10,6 @@ The main objective of this project is to explore data-driven methods to optimize
 
 - **Navier-Stokes Modeling**: Implementation of a Physics-Informed Neural Network (PINN) to predict fluid dynamics using the Navier-Stokes equations.
 - **Reinforcement Learning**: Integration of the TD3 algorithm for continuous control in wind farm optimization.
-- **Data-Driven Approach**: Utilizes high-fidelity simulation data for training and evaluation.
 
 ## Project Report
 
